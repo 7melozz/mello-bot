@@ -1,16 +1,17 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.ai.agent import process_message
-from bot.api_client import (
-    get_user_by_telegram,
-    create_transaction,
-)
+
 import requests
+
+from bot.ai.agent import process_message
 from bot.api_client import (
     get_user_by_telegram,
     create_user,
     create_account,
+    create_transaction,
 )
+from bot.config import OWNER_ID
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -20,9 +21,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         user = get_user_by_telegram(telegram_id)
 
-        await update.message.reply_text(
-            f"Bem-vindo de volta, {user['name']}! 👋"
-        )
+        if telegram_id == OWNER_ID:
+            await update.message.reply_text(
+                "Bem-vindo de volta, Melo, my owner goat 🐐🔥"
+            )
+        else:
+            await update.message.reply_text(
+                f"Bem-vindo de volta, {user['name']}! 👋"
+            )
 
     except requests.HTTPError as e:
 
@@ -53,9 +59,9 @@ async def handle_message(
     try:
         telegram_id = update.effective_user.id
         message = update.message.text
-        print("Telegram ID:", update.effective_user.id)
-        print(f"Telegram ID: {telegram_id}")
-        print(f"Mensagem: {message}")
+
+        print("Telegram ID:", telegram_id)
+        print("Mensagem:", message)
 
         user = get_user_by_telegram(telegram_id)
 
@@ -67,4 +73,6 @@ async def handle_message(
 
     except Exception as e:
         print("ERRO:", repr(e))
-        await update.message.reply_text(f"Erro: {e}")
+        await update.message.reply_text(
+            f"Erro: {e}"
+        )
